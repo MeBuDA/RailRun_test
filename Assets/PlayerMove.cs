@@ -5,15 +5,14 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    [SerializeField][Range (0, 1)] float speed;
-    [SerializeField] GameObject[] Rails;
-    [SerializeField] GameObject[] PlayerInternal;
-    private Transform[][] targets = new Transform[3][];
+    [SerializeField][Range (0, 1)] float speed; //走るスピード
+    [SerializeField] GameObject[] Rails; //レール　Targetが子についたオブジェクト　左から順番にアタッチ
+    [SerializeField] GameObject[] PlayerInternal; //プレイヤーの乗るやつ　場所はスタートしたら強制移動なのでどこでも良い
+    private Transform[][] targets = new Transform[3][]; //Transform[x][] xはレールの個数
     private LTSpline[] paths;
-    private Vector3[][] targetVectors = new Vector3[3][];
+    private Vector3[][] targetVectors = new Vector3[3][]; //Vector3[x][] xはレールの個数 
     private float trackPosition;
     private int activeRailNum = 1;
-    private Transform activeRail;
     void Start ()
     {
         if (Rails != null)
@@ -32,10 +31,12 @@ public class PlayerMove : MonoBehaviour
                 targetVectors[k] = new Vector3[targets[k].Length];
                 paths = new LTSpline[targets[k].Length];
             }
+
             for (int j = 0; j < targets.Length; j++)
             {
                 for (int l = 0; l < targets[0].Length; l++)
                 {
+                    //targetsジャグ配列をVector3ジャグ配列に代入
                     targetVectors[j][l] = targets[j][l].position;
                 }
             }
@@ -46,11 +47,14 @@ public class PlayerMove : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        //前進
         paths[0].place (PlayerInternal[0].transform, trackPosition);
         paths[1].place (PlayerInternal[1].transform, trackPosition);
         paths[2].place (PlayerInternal[2].transform, trackPosition);
+        //レーンを増やしたらその都度増やす　どうにかしたい
         trackPosition += Time.deltaTime * speed;
-        
+
+        //レーン切り替え
         if (Input.GetKeyDown (KeyCode.RightArrow))
         {
             activeRailNum++;
@@ -72,7 +76,7 @@ public class PlayerMove : MonoBehaviour
         {
             case 0:
                 this.transform.parent = PlayerInternal[0].transform;
-                this.transform.localPosition = Vector3.zero;
+                this.transform.localPosition = Vector3.zero; //ここにアニメーションつければ回避っぽくなるかしら？　未検証
                 break;
             case 1:
                 this.transform.parent = PlayerInternal[1].transform;
@@ -82,15 +86,19 @@ public class PlayerMove : MonoBehaviour
                 this.transform.parent = PlayerInternal[2].transform;
                 this.transform.localPosition = Vector3.zero;
                 break;
-                //レーン増やしたら増やすこのやり方なんとかしたい
+                //レーンを増やしたらその都度増やす　どうにかしたい
         }
 
     }
 
+    ///<summary>
+    ///パスの生成
+    ///</summary>
     void pathSetUp ()
     {
         for (int i = 0; i < targets.Length; i++)
         {
+            //Vector3ジャグ配列を元にパスの配列に代入　spline曲線を生成
             paths[i] = new LTSpline (targetVectors[i]);
         }
     }
