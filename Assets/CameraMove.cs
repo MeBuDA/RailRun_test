@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
-    Transform cameraTrans;
+    private Transform cameraTrans;
+    private Vector3 vector3;
     [SerializeField] Transform playerTrans;
     [SerializeField] Vector3 cameraVec;
     [SerializeField] Vector3 cameraRot;
@@ -12,10 +13,12 @@ public class CameraMove : MonoBehaviour
     void Start ()
     {
         cameraTrans = transform;
-        cameraTrans.rotation = Quaternion.Euler (cameraRot);
     }
     void LateUpdate ()
     {
-        cameraTrans.position = Vector3.Lerp (cameraTrans.position, playerTrans.position + cameraVec, speed * Time.deltaTime);
+        vector3 = Vector3.Lerp (cameraTrans.position, playerTrans.position + cameraVec, speed * Time.deltaTime);
+        vector3.y = playerTrans.position.y + cameraVec.y;
+        cameraTrans.position = vector3;
+        cameraTrans.rotation = Quaternion.Euler(Vector3.Scale((playerTrans.rotation.eulerAngles + cameraRot) , Vector3.up));
     }
 }

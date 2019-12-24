@@ -10,6 +10,7 @@ public class DrawLineGizmos : MonoBehaviour
     {
         Gizmos.color = color;
         Transform[] targets = this.gameObject.GetComponentsInChildrenWithoutSelf<Transform> ();
+
         for (int i = 0; i < targets.Length - 1; i++)
         {
             Vector3 to = transform.TransformPoint (targets[i + 1].localPosition);
